@@ -5,7 +5,12 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    QCoreApplication::setOrganizationName("MSDS");
+    QCoreApplication::setOrganizationDomain("mollerware.com");
+    QCoreApplication::setApplicationName("QDOF");
+
     MainWindow w;
-    w.show();
+
     return a.exec();
 }
