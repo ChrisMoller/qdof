@@ -75,12 +75,29 @@ void MainWindow::setValue()
 
 void MainWindow::mfgrActivated(int idx)
 {
-    qInfo() << "mfgrActivated " << idx;
+    QVariant v = mfgrbox->itemData(idx);
+    mfgrIndex = idx;
+    CameraModel **models = (v.value<CameraModel **>());
+    //double lcoc = 0.019;
+    modelbox->clear();
+    for (int k = 0; models[k]; k++) {
+        CameraModel *model = models[k];
+        QString name = model->name;
+        double coc = model->coc;
+        modelbox->addItem(name, QVariant(coc));
+ //       if (k == 0) lcoc = coc;
+    }
+    modelIndex = 0;
+    //setCoc (lcoc);
+    setValue ();
 }
 
 void MainWindow::modelActivated(int idx)
 {
-    qInfo() << "modelActivated " << idx;
+    QVariant v = modelbox->itemData(idx);
+    modelIndex = idx;
+    //setCoc (v.toDouble ());
+    setValue ();
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -219,7 +236,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     Cameras *cameras = new Cameras;
 
-    QComboBox *mfgrbox  = new QComboBox();
+    mfgrbox  = new QComboBox();
     QObject::connect(mfgrbox,
                      SIGNAL(activated (int)),
                      this,
@@ -235,7 +252,7 @@ MainWindow::MainWindow(QWidget *parent)
     mfgrbox->setCurrentIndex (mfgrIndex);
 
     CameraModel **models = cameras->list[mfgrIndex]->models;
-    QComboBox *modelbox = new QComboBox();
+    modelbox = new QComboBox();
     QObject::connect(modelbox,
                      SIGNAL(activated (int)),
                      this,
@@ -248,7 +265,10 @@ MainWindow::MainWindow(QWidget *parent)
     }
     modelbox->setCurrentIndex (modelIndex);
 
+    coc_lbl = new QLineEdit(QString::number (coc));
+
     layout->addWidget(mfgrbox,  row, 0);
+    layout->addWidget(coc_lbl,  row, 1);
     row++;
     layout->addWidget(modelbox, row, 0);
 

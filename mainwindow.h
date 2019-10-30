@@ -24,13 +24,15 @@ private:
     double compute(double fl, double nd, double fd);
 
     DLineEdit *focal_length;
-    UnitsBox focal_units;
+    UnitsBox   focal_units;
     DLineEdit *near_distance;
-    UnitsBox near_units;
+    UnitsBox   near_units;
     DLineEdit *far_distance;
-    UnitsBox far_units;
-    QLabel   fval_lbl;
-    QLabel   coc_lbl;
+    UnitsBox   far_units;
+    QLabel     fval_lbl;
+    QLineEdit *coc_lbl;
+    QComboBox *mfgrbox;
+    QComboBox *modelbox;
     double coc;
     double dfl;
     double dnd;
