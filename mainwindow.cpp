@@ -5,7 +5,7 @@
 #include "mainwindow.h"
 #include "unitsbox.h"
 #include "dlineedit.h"
-
+#include "cameras.h"
 
 #define FOCAL_LENGTH  "focal_length"
 #define NEAR_DISTANCE "near_distance"
@@ -71,6 +71,16 @@ void MainWindow::setValue(int)
 void MainWindow::setValue()
 {
     setValue(0);
+}
+
+void MainWindow::mfgrActivated(int idx)
+{
+    qInfo() << "mfgrActivated " << idx;
+}
+
+void MainWindow::modelActivated(int idx)
+{
+    qInfo() << "modelActivated " << idx;
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -205,6 +215,42 @@ MainWindow::MainWindow(QWidget *parent)
                      this,
                      SLOT(setValue()));
 
+    row++;
+
+    Cameras *cameras = new Cameras;
+
+    QComboBox *mfgrbox  = new QComboBox();
+    QObject::connect(mfgrbox,
+                     SIGNAL(activated (int)),
+                     this,
+                     SLOT(mfgrActivated(int)));
+
+    for (int j = 0; cameras->list[j]; j++) {
+        Mfgr *mfgr  = cameras->list[j];
+        QString name = mfgr->name;
+        CameraModel **models = mfgr->models;
+        QVariant v = QVariant::fromValue(models);
+        mfgrbox->addItem(name, v);
+    }
+    mfgrbox->setCurrentIndex (mfgrIndex);
+
+    CameraModel **models = cameras->list[mfgrIndex]->models;
+    QComboBox *modelbox = new QComboBox();
+    QObject::connect(modelbox,
+                     SIGNAL(activated (int)),
+                     this,
+                     SLOT(modelActivated(int)));
+    for (int k = 0; models[k]; k++) {
+        CameraModel *model = models[k];
+        QString name = model->name;
+        double coc = model->coc;
+        modelbox->addItem(name, QVariant(coc));
+    }
+    modelbox->setCurrentIndex (modelIndex);
+
+    layout->addWidget(mfgrbox,  row, 0);
+    row++;
+    layout->addWidget(modelbox, row, 0);
 
     formGroupBox->setLayout(layout);
     formGroupBox->show();

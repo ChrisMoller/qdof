@@ -17,6 +17,8 @@ public:
 public slots:
   void setValue ();
   void setValue(int idx);
+  void mfgrActivated(int idx);
+  void modelActivated(int idx);
   
 private:
     double compute(double fl, double nd, double fd);
