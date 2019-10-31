@@ -21,7 +21,8 @@ public slots:
   void modelActivated(int idx);
   
 private:
-    double compute(double fl, double nd, double fd);
+    double compute();
+    void setCoc(double lcoc);
 
     DLineEdit *focal_length;
     UnitsBox   focal_units;

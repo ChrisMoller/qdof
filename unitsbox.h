@@ -3,13 +3,13 @@
 
 #include <QtWidgets>
 
-enum {
+typedef enum {
     UNITS_MILLIMETRE,
     UNITS_CENTIMETRE,
     UNITS_METRE,
     UNITS_INCH,
     UNITS_FOOT
-};
+} units_e;
 
 class UnitsBox : public QComboBox
 {

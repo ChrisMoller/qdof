@@ -2,10 +2,12 @@
 
 #include <QtWidgets>
 #include <QtGlobal>
+#include <math.h>
 #include "mainwindow.h"
 #include "unitsbox.h"
 #include "dlineedit.h"
 #include "cameras.h"
+#include "unitsbox.h"
 
 #define FOCAL_LENGTH  "focal_length"
 #define NEAR_DISTANCE "near_distance"
@@ -17,49 +19,49 @@
 #define MFGR          "mfgr"
 #define MODEL         "model"
 
-
-double MainWindow::compute(double fl, double nd, double fd)
+double MainWindow::compute()
 {
     double fls = focal_units.currentData ().toDouble ();
     double nds = near_units.currentData ().toDouble ();
     double fds = far_units.currentData ().toDouble ();
 
-    double sfl = fls * fl;
-    double snd = nds * nd;
-    double sfd = fds * fd;
-
+    double sfl = fls * dfl;
+    double snd = nds * dnd;
+    double sfd = fds * dfd;
     double fstop = sfl * sfl / coc;
+
     if (sfd > 0.0)
       fstop *= (sfd - snd) / (2.0 * sfd * snd);
     else
       fstop /= 2.0 * snd;
+
+    fval_lbl.setText("f/ = " + QString::number(fstop) + " @" + QString::number(sqrt(dnd * dfd)));
+
     return fstop;
 }
 
 void MainWindow::setValue(int)
 {
-    double fl;
-    try { fl = (focal_length->text ()).toDouble (); }
+    try { dfl = (focal_length->text ()).toDouble (); }
     catch (...) { return; }
 
-    double nd;
-    try { nd = (near_distance->text ()).toDouble (); }
+    try { dnd = (near_distance->text ()).toDouble (); }
     catch (...) { return; }
 
     QString fdc = far_distance->text ();
-    double fd = -1.0;
-    if (fdc.length () > 0) fd =  (far_distance->text ()).toDouble ();
+    dfd = -1.0;
+    if (fdc.length () > 0) dfd =  (far_distance->text ()).toDouble ();
 
-    double fstop = compute (fl, nd, fd);
-    fval_lbl.setText (QString::number (fstop));
+    double fstop = compute ();
+    fval_lbl.setText("f/ = " + QString::number(fstop) + " @" + QString::number(sqrt(dnd * dfd)));
 
     double fdi = far_units.currentIndex ();
     double ndi = near_units.currentIndex ();
     double fli = focal_units.currentIndex ();
 
-    settings.setValue(FOCAL_LENGTH,  fl);
-    settings.setValue(NEAR_DISTANCE, nd);
-    settings.setValue(FAR_DISTANCE,  fd);
+    settings.setValue(FOCAL_LENGTH,  dfl);
+    settings.setValue(NEAR_DISTANCE, dnd);
+    settings.setValue(FAR_DISTANCE,  dfd);
     settings.setValue(FOCAL_UNITS,   fli);
     settings.setValue(NEAR_UNITS,    ndi);
     settings.setValue(FAR_UNITS,     fdi);
@@ -73,22 +75,29 @@ void MainWindow::setValue()
     setValue(0);
 }
 
+void MainWindow::setCoc(double lcoc)
+{
+    coc = lcoc;
+    coc_lbl->setText (QString::number (coc));
+    setValue ();
+}
+
 void MainWindow::mfgrActivated(int idx)
 {
     QVariant v = mfgrbox->itemData(idx);
     mfgrIndex = idx;
     CameraModel **models = (v.value<CameraModel **>());
-    //double lcoc = 0.019;
+    double lcoc = 0.019;
     modelbox->clear();
     for (int k = 0; models[k]; k++) {
         CameraModel *model = models[k];
         QString name = model->name;
         double coc = model->coc;
         modelbox->addItem(name, QVariant(coc));
- //       if (k == 0) lcoc = coc;
+        if (k == 0) lcoc = coc;
     }
     modelIndex = 0;
-    //setCoc (lcoc);
+    setCoc (lcoc);
     setValue ();
 }
 
@@ -96,7 +105,7 @@ void MainWindow::modelActivated(int idx)
 {
     QVariant v = modelbox->itemData(idx);
     modelIndex = idx;
-    //setCoc (v.toDouble ());
+    setCoc (v.toDouble ());
     setValue ();
 }
 
@@ -121,9 +130,6 @@ MainWindow::MainWindow(QWidget *parent)
     coc   = settings.value(COC,  0.019).toDouble();
 
     int row = 0;
-
-
-
 
     QRegExp rx("[mcMif0-9.+-]*");
     QValidator *validator = new QRegExpValidator(rx, this);
@@ -218,14 +224,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     QString compute_button_style("background-color: yellow; color: red;");
     QFont   compute_button_font("bold");
-    QPushButton *compute_button = new QPushButton(QObject::tr("f stop"));
+    QPushButton *compute_button = new QPushButton(QObject::tr("Compute f stop"));
     compute_button->setStyleSheet (compute_button_style);
     compute_button->setFont(compute_button_font);
     compute_button->setToolTip ("Compute f-stop");
     layout->addWidget(compute_button, row, 0);
 
-    double fstop = compute (dfl, dnd, dfd);
-    fval_lbl.setText (QString::number (fstop));
+
     layout->addWidget(&fval_lbl, row, 1);
     QObject::connect(compute_button,
                      SIGNAL(clicked ()),
@@ -268,9 +273,11 @@ MainWindow::MainWindow(QWidget *parent)
     coc_lbl = new QLineEdit(QString::number (coc));
 
     layout->addWidget(mfgrbox,  row, 0);
-    layout->addWidget(coc_lbl,  row, 1);
     row++;
     layout->addWidget(modelbox, row, 0);
+    layout->addWidget(coc_lbl,  row, 1);
+
+    compute ();
 
     formGroupBox->setLayout(layout);
     formGroupBox->show();
@@ -278,5 +285,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+
 }
 
