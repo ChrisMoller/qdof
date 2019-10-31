@@ -8,13 +8,13 @@ class DLineEdit : public QLineEdit
 {
     Q_OBJECT
 public:
-    //DLineEdit(QWidget *parent = nullptr);
-    DLineEdit(UnitsBox *ubx, QWidget *parent = nullptr);
+    DLineEdit(UnitsBox *ubx, double inc, QWidget *parent = nullptr);
     void incDec(const QString &text);
 
 private:
     QWidget *mw;
     UnitsBox *ub;
+    double incr;
 
 signals:
     void textEdited(const QString &text);

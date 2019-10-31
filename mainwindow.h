@@ -30,8 +30,9 @@ private:
     UnitsBox   near_units;
     DLineEdit *far_distance;
     UnitsBox   far_units;
+    UnitsBox   pos_units;
     QLabel     fval_lbl;
-    QLineEdit *coc_lbl;
+    DLineEdit *coc_lbl;
     QComboBox *mfgrbox;
     QComboBox *modelbox;
     double coc;
@@ -41,6 +42,7 @@ private:
     int    dfli;
     int    dndi;
     int    dfdi;
+    int    dpoi;
     int    mfgrIndex;
     int    modelIndex;
 

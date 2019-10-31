@@ -2,18 +2,11 @@
 #include "mainwindow.h"
 #include "unitsbox.h"
 
-/*
-DLineEdit::DLineEdit(QWidget *parent)
-{
-    mw = parent;
-    ub = nullptr;
-}
-*/
-
-DLineEdit::DLineEdit(UnitsBox *ubx, QWidget *parent)
+DLineEdit::DLineEdit(UnitsBox *ubx, double inc, QWidget *parent)
 {
     mw = parent;
     ub = ubx;
+    incr = inc;
 }
 
 void DLineEdit::incDec(const QString &txt)
@@ -25,7 +18,7 @@ void DLineEdit::incDec(const QString &txt)
         case '+':
             {
                 try {
-                    double val = rem.toDouble() + 1.0;
+                    double val = rem.toDouble() + incr;
                     setText(QString::number (val));
                     reinterpret_cast<MainWindow *>(mw)->setValue();
                 }
@@ -37,7 +30,7 @@ void DLineEdit::incDec(const QString &txt)
         case '-':
             {
                 try {
-                    double val = rem.toDouble() - 1.0;
+                    double val = rem.toDouble() - incr;
                     setText(QString::number (val));
                     reinterpret_cast<MainWindow *>(mw)->setValue();
                 }
