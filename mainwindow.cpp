@@ -38,7 +38,8 @@ double MainWindow::compute()
 
     double pos = qSqrt(snd * sfd) / pds;
 
-    fval_lbl.setText("f/ = " + QString::number(fstop, 'g', 4) + " @" + QString::number(pos, 'g', 4));
+    fval_lbl.setText("f/ = " + QString::number(fstop, 'g', 4) + " @"
+		     + QString::number(pos, 'g', 4));
 
     return fstop;
 }
@@ -119,6 +120,9 @@ void MainWindow::modelActivated(int idx)
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    //QScreen *screen = QGuiApplication::primaryScreen();
+    //screen->setOrientationUpdateMask(Qt::PortraitOrientation | Qt::LandscapeOrientation);
+
     QSettings settings;
     coc        = settings.value(COC,  0.019).toDouble();
 
